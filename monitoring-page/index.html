@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="auto">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">友链监控 - Link Monitoring</title>
+  <meta name="description" id="page-description" content="友链可用性监控面板，实时展示各站点状态">
+  
+  <!-- Favicon (configured in config.js) -->
+  <link rel="icon" id="favicon" type="image/x-icon" href="./favicon.ico">
+  
+  <!-- Iconify -->
+  <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="./styles.css">
+  
+  <!-- Config -->
+  <script src="./config.js"></script>
+</head>
+<body>
+  <div class="page-wrapper">
+    <!-- Header -->
+    <header class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">
+          <iconify-icon icon="mdi:link-variant" class="title-icon"></iconify-icon>
+          <span id="site-title"></span>友链监控</span>
+        </h1>
+        <p class="page-subtitle" id="site-subtitle">实时监测友链可用性状态</p>
+      </div>
+      <div class="header-actions">
+        <a href="https://github.com/Kemeow0815/link-data" target="_blank" rel="noopener" class="join-btn" id="join-btn" title="加入友链">
+          <iconify-icon icon="mdi:plus"></iconify-icon>
+          加入
+        </a>
+        <button class="theme-toggle" id="themeToggle" title="切换主题">
+          <iconify-icon icon="mdi:weather-sunny" class="theme-icon light"></iconify-icon>
+          <iconify-icon icon="mdi:weather-night" class="theme-icon dark"></iconify-icon>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="page-main">
+      <div id="monitoring-container" class="monitoring-grid">
+        <div class="loading-message">
+          <iconify-icon icon="mdi:loading" class="spin"></iconify-icon>
+          正在加载监控数据...
+        </div>
+      </div>
+      
+      <!-- Pagination -->
+      <div id="pagination" class="pagination-container" style="display: none;">
+        <button class="pagination-btn" id="prevPage" disabled>
+          <iconify-icon icon="mdi:chevron-left"></iconify-icon>
+          上一页
+        </button>
+        <span class="pagination-info">
+          第 <span id="currentPage">1</span> / <span id="totalPages">1</span> 页
+        </span>
+        <button class="pagination-btn" id="nextPage" disabled>
+          下一页
+          <iconify-icon icon="mdi:chevron-right"></iconify-icon>
+        </button>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+      <p>数据来源: <a href="https://blog-link-monitor.268682.xyz/" target="_blank" rel="noopener" id="data-source">blog-link-monitor.268682.xyz</a></p>
+    </footer>
+  </div>
+
+  <!-- History Modal -->
+  <div id="history-modal" class="history-modal">
+    <div class="history-modal-overlay"></div>
+    <div class="history-modal-content">
+      <div class="history-modal-header">
+        <h3 class="history-modal-title">
+          <iconify-icon icon="mdi:history"></iconify-icon>
+          <span id="modal-site-title">历史记录</span>
+        </h3>
+        <button class="history-modal-close" id="modalClose">
+          <iconify-icon icon="mdi:close"></iconify-icon>
+        </button>
+      </div>
+      <div class="history-modal-body" id="modalBody">
+        <div class="loading-message">
+          <iconify-icon icon="mdi:loading" class="spin"></iconify-icon>
+          加载中...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="./app.js"></script>
+</body>
+</html>
