@@ -1,0 +1,45 @@
+---
+name: 友链模板
+about: 请根据指示规范填写友链格式。
+---
+
+<!-- 请在下方代码块的双引号中填写 -->
+```json
+{
+    "title": "",
+    "screenshot": "",
+    "url": "",
+    "avatar": "",
+    "description": "",
+    "keywords": ""
+}
+```
+
+样例：
+
+```json
+{
+  "title": "喵洛阁",
+  "screenshot": "https://jsd.268682.xyz/gh/Kemeow0815/img@main/img/screenshot.webp",
+  "url": "https://www.kemiaosw.top/",
+  "avatar": "https://wsrv.nl/?url=github.com/kemeow0815.png",
+  "description": "每一段旅行，都有终点。",
+  "keywords": "克喵"
+}
+```
+
+> {
+> 
+>   "title": "站点名称",
+> 
+>   "screenshot": "站点预览图链接",
+> 
+>   "url": "站点链接",
+> 
+>   "avatar": "头像链接",
+> 
+>   "description": "站点描述",
+> 
+>   "keywords": "关键词，作为分组名"
+> 
+> }
