@@ -1,0 +1,73 @@
+name: Check Friend Link
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  check-link:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.labels.*.name, 'link wanted')
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests
+      
+      - name: Extract and check link
+        id: check
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          python .github/scripts/check_link.py
+      
+      - name: Add active label on success
+        if: steps.check.outputs.result == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['active']
+            });
+      
+      - name: Close issue and add lost label on failure
+        if: steps.check.outputs.result == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Add lost label
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['lost']
+            });
+            
+            // Close the issue
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed'
+            });
+            
+            // Add comment with failure reason
+            const reason = '${{ steps.check.outputs.reason }}';
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `❌ 友链检查失败\n\n原因：${reason}\n\n请检查您的链接和JSON格式后重新提交。`
+            });

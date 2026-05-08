@@ -1,0 +1,85 @@
+name: Sync Friend Links
+
+on:
+  schedule:
+    # 每天早上 7 点运行 (UTC 时间 23:00，对应北京时间 7:00)
+    - cron: '0 23 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync-links:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: read
+    
+    steps:
+      - name: Checkout output branch
+        uses: actions/checkout@v4
+        with:
+          ref: output
+          fetch-depth: 0
+      
+      - name: Checkout main branch for scripts
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          path: main-branch
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          pip install requests
+      
+      - name: Sync friend links
+        id: sync
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          python main-branch/.github/scripts/sync_links.py
+      
+      - name: Check if there are changes
+        id: check_changes
+        run: |
+          if [ -f "links.json" ]; then
+            if git diff --quiet HEAD links.json 2>/dev/null; then
+              echo "has_changes=false" >> $GITHUB_OUTPUT
+              echo "No changes detected"
+            else
+              echo "has_changes=true" >> $GITHUB_OUTPUT
+              echo "Changes detected"
+            fi
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "New file will be created"
+          fi
+      
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # 如果 links.json 不存在，从 main-branch 复制（如果存在）
+          if [ ! -f "links.json" ] && [ -f "main-branch/links.json" ]; then
+            cp main-branch/links.json links.json
+          fi
+          
+          git add links.json
+          git commit -m "Update friend links - $(date '+%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git push origin output || echo "Nothing to push"
+      
+      - name: Output result
+        run: |
+          echo "Sync completed at $(date)"
+          if [ "${{ steps.check_changes.outputs.has_changes }}" == "true" ]; then
+            echo "Result: New data was added"
+          else
+            echo "Result: No new data"
+          fi
