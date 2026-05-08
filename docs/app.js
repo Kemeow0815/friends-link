@@ -33,6 +33,8 @@
   const nextPageBtn = document.getElementById('nextPage');
   const currentPageSpan = document.getElementById('currentPage');
   const totalPagesSpan = document.getElementById('totalPages');
+  const toast = document.getElementById('toast');
+  const toastMessage = document.getElementById('toast-message');
 
   // State
   let currentTheme = localStorage.getItem('theme') || (CONFIG.theme?.default || 'auto');
@@ -81,6 +83,31 @@
     const currentIndex = themes.indexOf(currentTheme);
     const nextTheme = themes[(currentIndex + 1) % themes.length];
     applyTheme(nextTheme);
+    showThemeToast(nextTheme);
+  }
+
+  function showThemeToast(theme) {
+    const themeNames = {
+      light: '浅色模式',
+      dark: '深色模式',
+      auto: '跟随系统'
+    };
+    
+    // 销毁上一个 toast
+    hideToast();
+    
+    // 显示新 toast
+    toastMessage.textContent = themeNames[theme] || theme;
+    toast.classList.add('show');
+    
+    // 3秒后自动隐藏
+    setTimeout(() => {
+      hideToast();
+    }, 3000);
+  }
+
+  function hideToast() {
+    toast.classList.remove('show');
   }
 
   // ========================================
