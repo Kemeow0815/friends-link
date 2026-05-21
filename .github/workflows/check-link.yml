@@ -25,7 +25,7 @@ jobs:
       - name: Check if whitelist label exists
         id: check-whitelist
         run: |
-          if [[ "${{ contains(github.event.issue.labels.*.name, 'whitelist') }}" == "true" ]]; then
+          if [[ "${{ contains(github.event.issue.labels.*.name, '白名单') }}" == "true" ]]; then
             echo "is_whitelist=true" >> "$GITHUB_OUTPUT"
           else
             echo "is_whitelist=false" >> "$GITHUB_OUTPUT"
