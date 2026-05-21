@@ -88,7 +88,7 @@ def is_duplicate(new_link, existing_links):
 
 
 def fetch_active_issues(owner, repo, token):
-    """获取带有 active 标签的开放 issues"""
+    """获取带有 active 或 whitelist 标签的开放 issues"""
     url = f'https://api.github.com/repos/{owner}/{repo}/issues'
     headers = {
         'Authorization': f'token {token}',
@@ -96,7 +96,7 @@ def fetch_active_issues(owner, repo, token):
     }
     params = {
         'state': 'open',
-        'labels': 'active',
+        'labels': 'active,whitelist',
         'per_page': 100
     }
     

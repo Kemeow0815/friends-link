@@ -22,7 +22,37 @@ jobs:
         run: |
           pip install requests
       
-      - name: Extract and check link
+      - name: Check if whitelist label exists
+        id: check-whitelist
+        run: |
+          if [[ "${{ contains(github.event.issue.labels.*.name, 'whitelist') }}" == "true" ]]; then
+            echo "is_whitelist=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_whitelist=false" >> "$GITHUB_OUTPUT"
+          fi
+      
+      - name: Add active label for whitelist
+        if: steps.check-whitelist.outputs.is_whitelist == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['active']
+            });
+            
+            // Add comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `✅ 白名单跳过检查\n\n该议题已加入白名单，直接通过审核。`
+            });
+      
+      - name: Extract and check link (not whitelist)
+        if: steps.check-whitelist.outputs.is_whitelist == 'false'
         id: check
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
@@ -31,7 +61,7 @@ jobs:
           python .github/scripts/check_link.py
       
       - name: Add active label on success
-        if: steps.check.outputs.result == 'success'
+        if: steps.check-whitelist.outputs.is_whitelist == 'false' && steps.check.outputs.result == 'success'
         uses: actions/github-script@v7
         with:
           script: |
@@ -43,7 +73,7 @@ jobs:
             });
       
       - name: Close issue and add lost label on failure
-        if: steps.check.outputs.result == 'failure'
+        if: steps.check-whitelist.outputs.is_whitelist == 'false' && steps.check.outputs.result == 'failure'
         uses: actions/github-script@v7
         with:
           script: |
